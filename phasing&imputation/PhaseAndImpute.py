@@ -162,9 +162,9 @@ def impute_chr_haps(haps_dir,ref_haps_dir,genetic_map,out_dir,chr_length,batch_t
             blocks+=1
         mkdirs(f'{out_dir}/{chrid}')
         for bidx in range(blocks):
-            start_pos=int(block_size*bidx)
-            end_pos=int(block_size*(bidx+1))
-            out_prefix=f'{out_dir}/{chrid}/IMPUTE2_{chrid}.{start_pos//int(1e6)}-{end_pos//int(1e6)}Mb'
+            start_pos=int(pos[0]+block_size*bidx)
+            end_pos=int(pos[0]+block_size*(bidx+1))
+            out_prefix=f'{out_dir}/{chrid}/IMPUTE2_{chrid}.{start_pos//int(1e6)}-{end_pos//int(1e6)}Mb.gen'
             cmd= impute_haps(out_prefix,
                             f'{haps_dir}/{chrid}.haps',
                             f'{haps_dir}/{chrid}.sample',
@@ -221,12 +221,12 @@ def batchShellTask(all_task,limit_task,Log_file):
         break_out = True
         p = subprocess.Popen(task, shell=True, stdin=log, stdout=log, stderr=log, close_fds=True)
         task_pool.append(p)
-        print(time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime()) + ' '+str(p.pid)+': '+task+' start ...')
+        print(time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime()) + ' '+str(p.pid)+': '+task+' start ...',flush=True)
         if len(task_pool)==limit_task or task_remain==0:
             while break_out:
                 for intask_Popen in task_pool:
                     if intask_Popen.poll()!=None:
-                        print(time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime()) + ' '+str(intask_Popen.pid)+': '+' finish...')
+                        print(time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime()) + ' '+str(intask_Popen.pid)+': '+' finish...',flush=True)
                         task_pool.remove(intask_Popen)
                         break_out = False
                         if task_remain==0:

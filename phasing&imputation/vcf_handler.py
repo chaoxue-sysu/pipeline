@@ -97,6 +97,18 @@ def get_chr_length(ref_fa,out):
         bw.write(info+'\n')
     bw.close()
 
+import os
+def rename(dir):
+    for chr in os.listdir(dir):
+        chr_dir=os.path.join(dir,chr)
+        for file in os.listdir(chr_dir):
+            if file.__contains__('.gen'):
+                continue
+            newfile='Mb.gen'.join(file.split('Mb'))
+            os.rename(os.path.join(chr_dir,file),os.path.join(chr_dir,newfile))
+            cmd=f'rename {os.path.join(chr_dir,file)} {os.path.join(chr_dir,newfile)}'
+            print(cmd)
+            # os.system(cmd)
 
 
 
@@ -105,4 +117,6 @@ if __name__=='__main__':
     # add_sex_info(sys.argv[1],sys.argv[2],sys.argv[3])
     # 'plink --geno 0.1 --hwe 1e-5 --maf 0.01 --mind 0.1'
     # remove_ped_duplicate_snp(sys.argv[1],sys.argv[2])
-    get_chr_length(sys.argv[1],sys.argv[2])
+    # get_chr_length(sys.argv[1],sys.argv[2])
+    # print('IMPUTE2_chr1.85-90Mb'.split('Mb'))
+    rename(sys.argv[1])
