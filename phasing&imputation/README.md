@@ -18,11 +18,34 @@
 #### 2. 质控
 基因型数据的质量对下游分析有关键的影响，质控步骤必不可少。质控主要从样本和maker(SNP)
 质量两个角度进行。
+根据 [Gamazon](https://www.nature.com/articles/ng.3367#methods) 的质控方法:
+> Approximately 650,000 SNPs (minor allele frequency (MAF) > 0.05, 
+>in Hardy-Weinberg equilibrium (P > 0.05) and with non-ambiguous strand 
+>mapping (no A/T or C/G SNPs)) comprised the input set of SNPs for 
+>imputation, which was performed on the University of Michigan Imputation 
+>Server39,40 with the following parameters: 1000G Phase 1 v3 ShapeIt2 
+>(no singletons) reference panel, SHAPEIT phasing and the EUR (European) 
+>population. Non-ambiguous-stranded SNPs with MAF > 0.05 and imputation 
+>R2 > 0.8 were retained for subsequent analysis. 
 
-plink进行质控：
+这里利用plink进行质控实现：
 ```bash 
-plink --recode ped --file $ped_prefix --out $out_ped_prefix --geno 0.05 --hwe 1e-5 --maf 0.01 --mind 0.05
+plink --recode ped --file $ped_prefix --out $out_ped_prefix --geno 0.05 --hwe 5e-2 --maf 0.05 --mind 0.05
 ```
+特别提出，当SNP芯片探针设计的无从考证时（测得的SNP可能是对应正链或负链的基因型），
+在严格要求正确的情况下，我们只能删除链歧义的SNP位点，即A/T，C/G等位基因的情况。
+而非歧义的SNP位点可以通过后续与参考基因组相同位置碱基的比较来判断改位点探针的正负链。
+如A/C，参考基因组正(+)链为T，那么可以判定此位点的基因型基于负(-)链。
+
+顺便提一下，Gamazon使用的[University of Michigan Imputation Server](https://imputationserver.sph.umich.edu/)
+，这是一个用于基因型填充的界面友好的网页服务器，用户只需要上传基因型文件，并设置相关参数即可。
+等到任务在服务器后台执行完成后，用户就可以下载填充结果。其使用的pipeline采用
+[Eagle](https://www.nature.com/articles/ng.3571) (Phasing) +
+[Minimac4](https://github.com/statgen/Minimac4) (Imputation)，
+详见
+[imputationserver](https://github.com/genepi/imputationserver/blob/master/docs/pipeline.md)
+。参考文献见 [Next-generation genotype imputation service and methods, Nat. Genet.](https://www.nature.com/articles/ng.3656#ref8)
+。
 
 | Feature | As summary statistic |A s inclusion criteria |
 |--|--|--|
